@@ -1,0 +1,6 @@
+sige.db
+__pycache__/
+*.pyc
+.venv/
+# configuración local de Claude Code (tiene rutas de esta PC)
+.claude/

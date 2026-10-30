@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block titulo %}Usuarios{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h3 mb-0">Usuarios</h1>
+  <a class="btn btn-primary" href="{{ url_for('administracion.usuarios_nuevo') }}">Nuevo usuario</a>
+</div>
+
+<div class="tarjeta">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th></th></tr></thead>
+      <tbody>
+        {% for u in usuarios %}
+          <tr>
+            <td><code>{{ u.usuario }}</code></td>
+            <td>{{ u.nombre }}</td>
+            <td>
+              <form class="d-flex gap-2" method="post" action="{{ url_for('administracion.usuarios_rol', id=u.id) }}">
+                <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+                <select class="form-select form-select-sm" name="rol" aria-label="Rol de {{ u.usuario }}" style="max-width: 12rem">
+                  {% for clave, texto in ROLES.items() %}
+                    <option value="{{ clave }}" {% if u.rol == clave %}selected{% endif %}>{{ texto }}</option>
+                  {% endfor %}
+                </select>
+                <button class="btn btn-sm btn-outline-primary" type="submit">Cambiar rol</button>
+              </form>
+            </td>
+            <td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('administracion.usuarios_editar', id=u.id) }}">Editar</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

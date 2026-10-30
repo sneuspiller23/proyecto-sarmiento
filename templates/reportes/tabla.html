@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1">
+  <h1 class="h3 mb-0">{{ titulo }}</h1>
+  <a class="btn btn-success" href="{{ url_for(endpoint, curso_id=curso_id, formato='csv') }}">Descargar CSV</a>
+</div>
+<p class="text-muted">{{ descripcion }}</p>
+
+<form class="tarjeta row g-2 align-items-end" method="get">
+  <div class="col-sm-6 col-md-4">
+    <label class="form-label" for="curso_id">Curso</label>
+    <select class="form-select" id="curso_id" name="curso_id" onchange="this.form.submit()">
+      {% if permite_todos %}<option value="">Todos los cursos</option>{% endif %}
+      {% for c in cursos %}
+        <option value="{{ c.id }}" {% if c.id == curso_id %}selected{% endif %}>{{ c.nombre }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-auto"><button class="btn btn-outline-primary" type="submit">Ver</button></div>
+  <div class="col-auto"><a class="btn btn-link" href="{{ url_for('reportes.index') }}">Otros reportes</a></div>
+</form>
+
+<div class="tarjeta">
+  <div class="table-responsive">
+    <table class="table table-hover table-sm align-middle mb-0">
+      <thead><tr>{% for e in encabezados %}<th>{{ e }}</th>{% endfor %}{% if ids %}<th></th>{% endif %}</tr></thead>
+      <tbody>
+        {% for fila in filas %}
+          <tr>
+            {% for celda in fila %}
+              <td>{% if celda is string and celda.startswith('Revisar') %}
+                    <span class="badge text-bg-warning">{{ celda }}</span>
+                  {% else %}{{ celda }}{% endif %}</td>
+            {% endfor %}
+            {% if ids %}
+              <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{{ url_for('estudiantes.trayectoria', id=ids[loop.index0]) }}">Trayectoria</a></td>
+            {% endif %}
+          </tr>
+        {% else %}
+          <tr><td colspan="{{ encabezados|length + 1 }}" class="text-muted">No hay datos para mostrar.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

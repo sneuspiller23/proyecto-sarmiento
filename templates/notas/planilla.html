@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block titulo %}Notas {{ materia.nombre }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-0">{{ materia.nombre }} — {{ materia.curso }}</h1>
+    <div class="text-muted">{{ trimestre }}.º trimestre {{ materia.anio_lectivo }} · Notas de {{ NOTA_MIN }} a {{ NOTA_MAX }} (se aprueba con {{ NOTA_APROBACION }})</div>
+  </div>
+  <a class="btn btn-outline-secondary" href="{{ url_for('aula.notas_seleccion', materia_id=materia.id) }}">Cambiar materia o trimestre</a>
+</div>
+
+{% if errores %}
+  <div class="alert alert-danger">
+    <strong>No se guardó ninguna nota.</strong> Corrija las {{ errores|length }} marcada(s) en rojo y vuelva a guardar.
+  </div>
+{% endif %}
+
+{% if estudiantes %}
+  <form method="post" data-un-envio novalidate>
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <input type="hidden" name="materia_id" value="{{ materia.id }}">
+    <input type="hidden" name="trimestre" value="{{ trimestre }}">
+    <div class="tarjeta">
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead><tr><th>Estudiante</th><th>Nota</th><th>Observación (opcional)</th></tr></thead>
+          <tbody>
+            {% for e in estudiantes %}
+              {% set error = errores.get(e.id) %}
+              <tr>
+                <td>{{ e.apellido }}, {{ e.nombre }}</td>
+                <td>
+                  <input class="form-control nota-input{% if error %} is-invalid{% endif %}" name="nota_{{ e.id }}"
+                         value="{{ valores[e.id].nota }}" inputmode="decimal" aria-label="Nota de {{ e.apellido }}">
+                  {% if error %}<div class="invalid-feedback d-block">{{ error }}</div>{% endif %}
+                </td>
+                <td><input class="form-control" name="obs_{{ e.id }}" value="{{ valores[e.id].observacion }}" maxlength="200"
+                           aria-label="Observación de {{ e.apellido }}"></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="small text-muted mt-2 mb-0">Deje la nota vacía si todavía no la tiene. Se aceptan decimales (7,5).</p>
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg mb-4" data-enviando="Guardando…">Guardar notas</button>
+  </form>
+{% else %}
+  <div class="tarjeta text-muted">El curso no tiene estudiantes inscriptos.</div>
+{% endif %}
+{% endblock %}

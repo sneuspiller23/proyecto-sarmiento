@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as m %}
+{% block titulo %}{{ 'Editar usuario' if usuario_editado else 'Nuevo usuario' }}{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-3">{{ 'Editar usuario ' ~ usuario_editado.usuario if usuario_editado else 'Nuevo usuario' }}</h1>
+{{ m.resumen_errores(errores) }}
+<form class="tarjeta" method="post" data-un-envio novalidate>
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <div class="row">
+    <div class="col-md-6">
+      {% if usuario_editado %}
+        <div class="mb-3">
+          <label class="form-label" for="usuario">Usuario</label>
+          <input class="form-control" id="usuario" value="{{ usuario_editado.usuario }}" readonly>
+        </div>
+      {% else %}
+        {{ m.campo('usuario', 'Usuario', datos, errores, ayuda='Minúsculas, sin espacios. Ej.: jperez') }}
+      {% endif %}
+    </div>
+    <div class="col-md-6">{{ m.campo('nombre', 'Nombre y apellido', datos, errores) }}</div>
+    <div class="col-md-6">{{ m.lista('rol', 'Rol', datos, errores, ROLES.items()) }}</div>
+    <div class="col-md-6">
+      {{ m.campo('clave', 'Contraseña nueva' if usuario_editado else 'Contraseña', {}, errores, tipo='password',
+                 ayuda='Déjela vacía para no cambiarla.' if usuario_editado else 'Al menos 4 caracteres.',
+                 extra='autocomplete="new-password"') }}
+    </div>
+  </div>
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary" data-enviando="Guardando…">Guardar</button>
+    <a class="btn btn-outline-secondary" href="{{ url_for('administracion.usuarios_lista') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

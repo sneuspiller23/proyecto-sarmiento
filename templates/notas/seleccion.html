@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block titulo %}Notas{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-3">Cargar notas</h1>
+
+{% if materias %}
+  <form class="tarjeta row g-3 align-items-end" method="get" action="{{ url_for('aula.notas_planilla') }}">
+    <div class="col-sm-6">
+      <label class="form-label" for="materia_id">Materia</label>
+      <select class="form-select form-select-lg" id="materia_id" name="materia_id" required>
+        {% for mat in materias %}
+          <option value="{{ mat.id }}" {% if mat.id == elegida %}selected{% endif %}>{{ mat.nombre }} — {{ mat.curso }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-sm-3">
+      <label class="form-label" for="trimestre">Trimestre</label>
+      <select class="form-select form-select-lg" id="trimestre" name="trimestre">
+        <option value="1">1.er trimestre</option>
+        <option value="2">2.º trimestre</option>
+        <option value="3">3.er trimestre</option>
+      </select>
+    </div>
+    <div class="col-sm-3">
+      <button class="btn btn-primary btn-lg w-100" type="submit">Abrir planilla</button>
+    </div>
+  </form>
+{% else %}
+  <div class="tarjeta text-muted">No tiene materias asignadas en {{ ANIO_ACTUAL }}. Consulte con Administración.</div>
+{% endif %}
+{% endblock %}

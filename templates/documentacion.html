@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block titulo %}Documentación{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 d-print-none">
+  <p class="text-muted mb-0">Documentación del sistema (README del proyecto). Solo la ve Administración.</p>
+  <button type="button" class="btn btn-outline-primary" onclick="window.print()">Imprimir</button>
+</div>
+<article class="tarjeta documentacion p-4">
+  {{ contenido|safe }}
+</article>
+{% endblock %}

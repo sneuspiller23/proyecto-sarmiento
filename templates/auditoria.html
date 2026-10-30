@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block titulo %}Auditoría{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-1">Auditoría</h1>
+<p class="text-muted">Quién hizo cada cambio y cuándo. Se muestran los últimos 300 registros que coinciden con el filtro.</p>
+
+<form class="tarjeta row g-2 align-items-end" method="get">
+  <div class="col-sm-6 col-lg-3">
+    <label class="form-label" for="usuario_id">Usuario</label>
+    <select class="form-select" id="usuario_id" name="usuario_id">
+      <option value="">Todos</option>
+      {% for u in usuarios %}
+        <option value="{{ u.id }}" {% if filtros.usuario_id == u.id|string %}selected{% endif %}>{{ u.nombre }} ({{ u.usuario }})</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <label class="form-label" for="accion">Acción</label>
+    <select class="form-select" id="accion" name="accion">
+      <option value="">Todas</option>
+      {% for a in acciones %}<option {% if filtros.accion == a %}selected{% endif %}>{{ a }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-sm-4 col-lg-2">
+    <label class="form-label" for="desde">Desde</label>
+    <input class="form-control" type="date" id="desde" name="desde" value="{{ filtros.desde }}">
+  </div>
+  <div class="col-sm-4 col-lg-2">
+    <label class="form-label" for="hasta">Hasta</label>
+    <input class="form-control" type="date" id="hasta" name="hasta" value="{{ filtros.hasta }}">
+  </div>
+  <div class="col-sm-4 col-lg-2 d-flex gap-2">
+    <button class="btn btn-outline-primary" type="submit">Filtrar</button>
+    <a class="btn btn-link" href="{{ url_for('administracion.auditoria') }}">Limpiar</a>
+  </div>
+</form>
+
+<div class="tarjeta">
+  <div class="table-responsive">
+    <table class="table table-sm table-hover align-middle mb-0">
+      <thead><tr><th>Fecha y hora</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr></thead>
+      <tbody>
+        {% for r in registros %}
+          <tr>
+            <td class="text-nowrap">{{ r.fecha_hora|fecha }}</td>
+            <td>{% if r.usuario %}{{ r.nombre }} <span class="text-muted small">({{ r.usuario }})</span>{% else %}<span class="text-muted">Sistema</span>{% endif %}</td>
+            <td>{{ r.accion }}</td>
+            <td class="small">{{ r.detalle }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="4" class="text-muted">No hay registros con ese filtro.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

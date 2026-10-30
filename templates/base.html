@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Inicio{% endblock %} · SIGE</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="navbar navbar-dark barra-superior d-print-none">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-semibold" href="{{ url_for('general.inicio') }}">
+        <span class="d-none d-sm-inline">Sistema Integral de Gestión Escolar</span>
+        <span class="d-sm-none">SIGE</span>
+      </a>
+      {% if usuario %}
+        <div class="d-flex align-items-center gap-2 text-white">
+          <span class="d-none d-md-inline">{{ usuario.nombre }}</span>
+          <span class="badge text-bg-light">{{ ROLES[usuario.rol] }}</span>
+          <form method="post" action="{{ url_for('general.logout') }}" class="m-0">
+            <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-sm btn-outline-light">Salir</button>
+          </form>
+        </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="container-fluid">
+    <div class="row">
+      {% if usuario %}
+        <nav class="col-md-3 col-lg-2 menu-lateral d-print-none">
+          <ul class="nav nav-pills flex-md-column">
+            {% for item in menu %}
+              <li class="nav-item">
+                <a class="nav-link{% if item.activo %} active{% endif %}" href="{{ item.url }}">{{ item.texto }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </nav>
+      {% endif %}
+
+      <main class="col contenido">
+        <div class="d-print-none">
+          {% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
+            <div class="alert alert-{{ categoria }} alert-dismissible fade show" role="alert">
+              {{ mensaje }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+          {% endfor %}
+        </div>
+        {% block contenido %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='vendor/bootstrap.bundle.min.js') }}"></script>
+  <script>
+    // Evita el doble envío: después del primer clic el botón queda desactivado.
+    document.querySelectorAll('form[data-un-envio]').forEach(function (form) {
+      form.addEventListener('submit', function () {
+        form.querySelectorAll('button[type=submit]').forEach(function (boton) {
+          boton.disabled = true;
+          if (boton.dataset.enviando) { boton.textContent = boton.dataset.enviando; }
+        });
+      });
+    });
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

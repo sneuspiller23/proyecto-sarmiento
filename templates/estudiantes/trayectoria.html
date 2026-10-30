@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as m %}
+{% block titulo %}Trayectoria de {{ estudiante.apellido }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-1">{{ estudiante.apellido }}, {{ estudiante.nombre }}</h1>
+    <div class="text-muted">
+      DNI {{ estudiante.dni }} · Nacimiento {{ estudiante.fecha_nac|fecha }}
+      {% if inscripcion %} · {{ inscripcion.curso }} {{ anio }}{% endif %}
+      {% if not estudiante.activo %}<span class="badge text-bg-secondary">Desactivado</span>{% endif %}
+    </div>
+    <div class="mt-2">{{ m.alertas(alertas) }}</div>
+  </div>
+  {% if usuario.rol == 'admin' %}
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary" href="{{ url_for('estudiantes.editar', id=estudiante.id) }}">Editar datos</a>
+      {% if estudiante.activo and not inscripciones|selectattr('anio_lectivo', 'equalto', ANIO_ACTUAL)|list %}
+        <a class="btn btn-primary" href="{{ url_for('inscripciones.nueva', dni=estudiante.dni) }}">Inscribir en {{ ANIO_ACTUAL }}</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+{% if alertas %}
+  <div class="alert alert-warning small">
+    Las alertas solo señalan situaciones para revisar. La decisión sobre qué hacer es del equipo escolar.
+  </div>
+{% endif %}
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="tarjeta h-100">
+      <h2 class="h5">Datos y responsable</h2>
+      <dl class="row mb-0">
+        <dt class="col-5">Responsable</dt><dd class="col-7">{{ estudiante.responsable_nombre }}</dd>
+        <dt class="col-5">Teléfono</dt><dd class="col-7">{{ estudiante.responsable_telefono }}</dd>
+      </dl>
+      <h2 class="h5 mt-3">Inscripciones</h2>
+      {% for i in inscripciones %}
+        <div class="d-flex justify-content-between align-items-center border-bottom py-1 gap-2">
+          <span>
+            {% if i.anio_lectivo == anio %}<strong>{{ i.anio_lectivo }} · {{ i.curso }}</strong>
+            {% else %}<a href="{{ url_for('estudiantes.trayectoria', id=estudiante.id, anio=i.anio_lectivo) }}">{{ i.anio_lectivo }} · {{ i.curso }}</a>{% endif %}
+            <span class="small text-muted">({{ i.fecha|fecha }})</span>
+          </span>
+          {% if usuario.rol in ('admin', 'directivo') %}
+            <a class="btn btn-sm btn-link" href="{{ url_for('inscripciones.ver', id=i.id) }}">Constancia</a>
+          {% endif %}
+        </div>
+      {% else %}
+        <p class="text-muted mb-0">Sin inscripciones registradas.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="tarjeta h-100">
+      <h2 class="h5">Asistencia {{ anio }}</h2>
+      {% if asistencia and asistencia.total %}
+        <div class="row text-center g-2 mb-2">
+          <div class="col-3"><div class="contador">{{ asistencia.porcentaje|nota }}%</div><div class="small text-muted">Asistencia</div></div>
+          <div class="col-3"><div class="contador {% if asistencia.ausentes > LIMITE_FALTAS %}text-danger{% endif %}">{{ asistencia.ausentes }}</div><div class="small text-muted">Faltas</div></div>
+          <div class="col-3"><div class="contador">{{ asistencia.tardes }}</div><div class="small text-muted">Tardes</div></div>
+          <div class="col-3"><div class="contador">{{ asistencia.total }}</div><div class="small text-muted">Días registrados</div></div>
+        </div>
+        <p class="small text-muted mb-1">Límite de faltas: {{ LIMITE_FALTAS }}. Las llegadas tarde cuentan como asistencia.</p>
+        {% if faltas_recientes %}
+          <p class="small mb-0"><strong>Últimas faltas:</strong>
+            {% for f in faltas_recientes %}{{ f.fecha|fecha }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+        {% endif %}
+      {% else %}
+        <p class="text-muted mb-0">Todavía no hay asistencia registrada este año.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="tarjeta mt-3">
+  <h2 class="h5">Notas {{ anio }}</h2>
+  {% if materias %}
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead><tr><th>Materia</th><th>Docente</th><th class="text-center">1.er trim.</th><th class="text-center">2.º trim.</th><th class="text-center">3.er trim.</th><th class="text-center">Promedio</th><th>Observaciones</th></tr></thead>
+        <tbody>
+          {% for materia in materias %}
+            <tr>
+              <td>{{ materia.nombre }}</td>
+              <td class="text-muted">{{ materia.docente or '—' }}</td>
+              {% for t in (1, 2, 3) %}
+                <td class="text-center">
+                  {% if materia.notas.get(t) is not none %}
+                    <span class="badge fs-6 {% if materia.notas[t] < NOTA_APROBACION %}text-bg-danger{% else %}text-bg-light border{% endif %}">{{ materia.notas[t]|nota }}</span>
+                  {% else %}<span class="text-muted">—</span>{% endif %}
+                </td>
+              {% endfor %}
+              {% set valores = materia.notas.values()|list %}
+              <td class="text-center fw-semibold">{{ (((valores|sum / valores|length) * 10)|round / 10)|nota if valores else '—' }}</td>
+              <td class="small">{{ materia.observaciones|join(' · ') }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="small text-muted mt-2 mb-0">Escala de {{ NOTA_MIN }} a {{ NOTA_MAX }}. Se aprueba con {{ NOTA_APROBACION }}.</p>
+  {% else %}
+    <p class="text-muted mb-0">No está inscripto/a en {{ anio }}.</p>
+  {% endif %}
+</div>
+{% endblock %}

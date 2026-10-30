@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block titulo %}Materias{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h3 mb-0">Materias {{ ANIO_ACTUAL }}</h1>
+  <a class="btn btn-primary" href="{{ url_for('administracion.materias_nueva', curso_id=curso_id) }}">Nueva materia</a>
+</div>
+
+<form class="tarjeta row g-2 align-items-end" method="get">
+  <div class="col-sm-6 col-md-4">
+    <label class="form-label" for="curso_id">Curso</label>
+    <select class="form-select" id="curso_id" name="curso_id" onchange="this.form.submit()">
+      <option value="">Todos los cursos</option>
+      {% for c in cursos %}<option value="{{ c.id }}" {% if c.id == curso_id %}selected{% endif %}>{{ c.nombre }}</option>{% endfor %}
+    </select>
+  </div>
+</form>
+
+<div class="tarjeta">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Curso</th><th>Materia</th><th>Docente</th><th>Notas cargadas</th><th></th></tr></thead>
+      <tbody>
+        {% for mat in materias %}
+          <tr>
+            <td>{{ mat.curso }}</td>
+            <td><strong>{{ mat.nombre }}</strong></td>
+            <td>{{ mat.docente or '—' }}</td>
+            <td>{{ mat.notas }}</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('administracion.materias_editar', id=mat.id) }}">Editar</a>
+              <form class="d-inline" method="post" action="{{ url_for('administracion.materias_eliminar', id=mat.id) }}"
+                    onsubmit="return confirm('¿Eliminar {{ mat.nombre }} de {{ mat.curso }}?');">
+                <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+                <button class="btn btn-sm btn-outline-danger" type="submit" {% if mat.notas %}disabled title="Tiene notas cargadas"{% endif %}>Eliminar</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="text-muted">No hay materias cargadas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

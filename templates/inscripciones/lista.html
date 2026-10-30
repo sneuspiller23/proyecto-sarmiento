@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block titulo %}Inscripciones{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h3 mb-0">Inscripciones {{ anio }}</h1>
+  {% if usuario.rol == 'admin' %}
+    <a class="btn btn-primary" href="{{ url_for('inscripciones.nueva') }}">Nueva inscripción</a>
+  {% endif %}
+</div>
+
+<form class="tarjeta row g-2 align-items-end" method="get">
+  <div class="col-auto">
+    <label class="form-label" for="anio">Año lectivo</label>
+    <select class="form-select" id="anio" name="anio" onchange="this.form.curso_id.value = ''; this.form.submit()">
+      {% for a in anios %}<option value="{{ a }}" {% if a == anio %}selected{% endif %}>{{ a }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-sm-6 col-md-4">
+    <label class="form-label" for="curso_id">Curso</label>
+    <select class="form-select" id="curso_id" name="curso_id" onchange="this.form.submit()">
+      <option value="">Todos los cursos</option>
+      {% for c in cursos %}
+        <option value="{{ c.id }}" {% if c.id == curso_id %}selected{% endif %}>{{ c.nombre }} ({{ c.inscriptos }}/{{ c.cupo }})</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-auto"><button class="btn btn-outline-primary" type="submit">Filtrar</button></div>
+</form>
+
+<div class="tarjeta">
+  <p class="text-muted small">{{ inscripciones|length }} inscripción(es)</p>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Número</th><th>Fecha</th><th>Estudiante</th><th>DNI</th><th>Curso</th><th>Registrada por</th><th></th></tr></thead>
+      <tbody>
+        {% for i in inscripciones %}
+          <tr>
+            <td class="text-nowrap">{{ numero_inscripcion(i.id, i.anio_lectivo) }}</td>
+            <td>{{ i.fecha|fecha }}</td>
+            <td>{{ i.apellido }}, {{ i.nombre }}</td>
+            <td>{{ i.dni }}</td>
+            <td>{{ i.curso }}</td>
+            <td>{{ i.registrada_por or '—' }}</td>
+            <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{{ url_for('inscripciones.ver', id=i.id) }}">Constancia</a></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="7" class="text-muted">No hay inscripciones.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,160 @@
+/* Estilo sobrio del SIGE. El resto lo pone Bootstrap. */
+
+body {
+  background: #f4f6f9;
+  color: #212529;
+}
+
+.barra-superior {
+  background: #1f3a5f;
+}
+
+.menu-lateral {
+  background: #fff;
+  border-right: 1px solid #dee2e6;
+  padding: 1rem .75rem;
+}
+
+.menu-lateral .nav-link {
+  color: #1f3a5f;
+  border-radius: .375rem;
+}
+
+@media (min-width: 768px) {
+  .menu-lateral {
+    min-height: calc(100vh - 56px); /* el fondo blanco llega hasta abajo */
+  }
+}
+
+.menu-lateral .nav-link.active {
+  background: #1f3a5f;
+  color: #fff;
+}
+
+.contenido {
+  padding: 1.5rem;
+  max-width: 1200px;
+  min-width: 0; /* sin esto, una tabla ancha empuja el contenido debajo del menú */
+}
+
+.tarjeta {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: .5rem;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.contador {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1f3a5f;
+  line-height: 1.1;
+}
+
+.table thead th {
+  background: #e9eef5;
+  white-space: nowrap;
+}
+
+.pasos .paso {
+  color: #6c757d;
+}
+
+.pasos .paso.actual {
+  color: #1f3a5f;
+  font-weight: 600;
+}
+
+/* Planilla de asistencia: botones grandes, cómodos en una tableta */
+.planilla-asistencia .btn {
+  min-width: 5.5rem;
+}
+
+.nota-input {
+  max-width: 6rem;
+}
+
+/* En pantallas chicas el menú pasa arriba y se desplaza de costado */
+@media (max-width: 767.98px) {
+  .menu-lateral {
+    border-right: 0;
+    border-bottom: 1px solid #dee2e6;
+    padding: .5rem;
+  }
+
+  .menu-lateral .nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .menu-lateral .nav-link {
+    white-space: nowrap;
+  }
+
+  .contenido {
+    padding: 1rem;
+  }
+}
+
+/* Documentación (README) */
+.documentacion h1 {
+  font-size: 1.75rem;
+  color: #1f3a5f;
+}
+
+.documentacion h2 {
+  font-size: 1.3rem;
+  margin-top: 1.75rem;
+  padding-bottom: .25rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.documentacion h3 {
+  font-size: 1.1rem;
+  margin-top: 1.25rem;
+}
+
+.documentacion pre {
+  background: #f4f6f9;
+  border: 1px solid #dee2e6;
+  border-radius: .375rem;
+  padding: .75rem 1rem;
+}
+
+.documentacion code {
+  color: #1f3a5f;
+}
+
+/* Constancia lista para imprimir */
+.constancia {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.constancia dt {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.firma {
+  border-top: 1px solid #212529;
+  padding-top: .25rem;
+  margin-top: 3.5rem;
+  text-align: center;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .contenido {
+    padding: 0;
+    max-width: none;
+  }
+
+  .tarjeta {
+    border: 0;
+  }
+}

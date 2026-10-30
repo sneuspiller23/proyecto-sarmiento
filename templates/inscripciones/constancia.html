@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block titulo %}Constancia {{ numero_inscripcion(i.id, i.anio_lectivo) }}{% endblock %}
+{% block contenido %}
+<div class="d-print-none">
+  {% if usuario.rol == 'admin' %}
+    {% with paso = 3 %}{% include 'inscripciones/_pasos.html' %}{% endwith %}
+  {% endif %}
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <button type="button" class="btn btn-primary" onclick="window.print()">Imprimir</button>
+    {% if usuario.rol == 'admin' %}
+      <a class="btn btn-outline-primary" href="{{ url_for('inscripciones.nueva') }}">Nueva inscripción</a>
+    {% endif %}
+    <a class="btn btn-outline-secondary" href="{{ url_for('estudiantes.trayectoria', id=i.estudiante_id) }}">Ver trayectoria</a>
+  </div>
+</div>
+
+<div class="tarjeta constancia p-4">
+  <div class="text-center mb-4">
+    <div class="small text-muted text-uppercase">Sistema Integral de Gestión Escolar</div>
+    <h1 class="h3 mt-1 mb-0">Constancia de inscripción</h1>
+    <div class="fs-5 mt-1">N.º {{ numero_inscripcion(i.id, i.anio_lectivo) }}</div>
+  </div>
+
+  <p>
+    Se deja constancia de que <strong>{{ i.apellido }}, {{ i.nombre }}</strong>, DNI <strong>{{ i.dni }}</strong>,
+    quedó inscripto/a en <strong>{{ i.curso }}</strong> para el año lectivo <strong>{{ i.anio_lectivo }}</strong>.
+  </p>
+
+  <dl class="row">
+    <dt class="col-sm-5">Número de inscripción</dt><dd class="col-sm-7">{{ numero_inscripcion(i.id, i.anio_lectivo) }}</dd>
+    <dt class="col-sm-5">Estudiante</dt><dd class="col-sm-7">{{ i.apellido }}, {{ i.nombre }}</dd>
+    <dt class="col-sm-5">DNI</dt><dd class="col-sm-7">{{ i.dni }}</dd>
+    <dt class="col-sm-5">Fecha de nacimiento</dt><dd class="col-sm-7">{{ i.fecha_nac|fecha }}</dd>
+    <dt class="col-sm-5">Curso y división</dt><dd class="col-sm-7">{{ i.curso }}</dd>
+    <dt class="col-sm-5">Año lectivo</dt><dd class="col-sm-7">{{ i.anio_lectivo }}</dd>
+    <dt class="col-sm-5">Responsable</dt><dd class="col-sm-7">{{ i.responsable_nombre }} · {{ i.responsable_telefono }}</dd>
+    <dt class="col-sm-5">Fecha de inscripción</dt><dd class="col-sm-7">{{ i.fecha|fecha }}</dd>
+    <dt class="col-sm-5">Registrada por</dt><dd class="col-sm-7">{{ i.registrada_por or '—' }}</dd>
+  </dl>
+
+  <div class="row mt-5">
+    <div class="col-6"><div class="firma">Firma del responsable</div></div>
+    <div class="col-6"><div class="firma">Firma y sello del establecimiento</div></div>
+  </div>
+
+  <p class="small text-muted mt-4 mb-0">Emitida el {{ emitida|fecha }} a partir de los datos guardados en el sistema.</p>
+</div>
+{% endblock %}

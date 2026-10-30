@@ -1,0 +1,48 @@
+{# Campo de formulario con su mensaje de error al lado #}
+{% macro campo(nombre, etiqueta, datos, errores, tipo='text', ayuda=None, extra='') %}
+  <div class="mb-3">
+    <label class="form-label" for="{{ nombre }}">{{ etiqueta }}</label>
+    <input type="{{ tipo }}" class="form-control{% if errores.get(nombre) %} is-invalid{% endif %}"
+           id="{{ nombre }}" name="{{ nombre }}"
+           value="{{ datos.get(nombre) if datos.get(nombre) is not none else '' }}" {{ extra|safe }}>
+    {% if errores.get(nombre) %}
+      <div class="invalid-feedback">{{ errores[nombre] }}</div>
+    {% elif ayuda %}
+      <div class="form-text">{{ ayuda }}</div>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{# Lista desplegable. «opciones» puede ser una lista de pares (valor, texto) o de filas de la base;
+   con filas se indica qué columnas usar, por ejemplo valor='id', texto='nombre'. #}
+{% macro lista(nombre, etiqueta, datos, errores, opciones, valor=0, texto=1, vacia=None) %}
+  <div class="mb-3">
+    <label class="form-label" for="{{ nombre }}">{{ etiqueta }}</label>
+    <select class="form-select{% if errores.get(nombre) %} is-invalid{% endif %}" id="{{ nombre }}" name="{{ nombre }}">
+      {% if vacia %}<option value="">{{ vacia }}</option>{% endif %}
+      {% for opcion in opciones %}
+        <option value="{{ opcion[valor] }}" {% if datos.get(nombre)|string == opcion[valor]|string %}selected{% endif %}>{{ opcion[texto] }}</option>
+      {% endfor %}
+    </select>
+    {% if errores.get(nombre) %}<div class="invalid-feedback">{{ errores[nombre] }}</div>{% endif %}
+  </div>
+{% endmacro %}
+
+{# Resumen de errores arriba del formulario (es el único aviso: no se repite con un mensaje aparte) #}
+{% macro resumen_errores(errores, aviso='Todavía no se guardó nada.') %}
+  {% if errores %}
+    <div class="alert alert-danger">
+      <strong>{{ aviso }} Hay {{ errores|length }} dato(s) para corregir:</strong>
+      <ul class="mb-0">
+        {% for mensaje in errores.values() %}<li>{{ mensaje }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{# Etiquetas de alerta (solo señalan; no deciden nada) #}
+{% macro alertas(etiquetas) %}
+  {% for etiqueta in etiquetas %}
+    <span class="badge {% if 'asistencia' in etiqueta %}text-bg-warning{% else %}text-bg-danger{% endif %}">{{ etiqueta }}</span>
+  {% endfor %}
+{% endmacro %}

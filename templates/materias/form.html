@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as m %}
+{% block titulo %}{{ 'Editar materia' if materia else 'Nueva materia' }}{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-3">{{ 'Editar materia ' ~ materia.nombre if materia else 'Nueva materia' }}</h1>
+{{ m.resumen_errores(errores) }}
+<form class="tarjeta" method="post" data-un-envio novalidate>
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <div class="row">
+    <div class="col-md-4">{{ m.campo('nombre', 'Materia', datos, errores) }}</div>
+    <div class="col-md-4">{{ m.lista('curso_id', 'Curso ' ~ ANIO_ACTUAL, datos, errores, cursos, 'id', 'nombre', vacia='Elija un curso…') }}</div>
+    <div class="col-md-4">{{ m.lista('docente_id', 'Docente', datos, errores, docentes, 'id', 'nombre', vacia='Sin docente asignado') }}</div>
+  </div>
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary" data-enviando="Guardando…">Guardar</button>
+    <a class="btn btn-outline-secondary" href="{{ url_for('administracion.materias_lista') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

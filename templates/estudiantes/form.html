@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as m %}
+{% block titulo %}{{ 'Editar estudiante' if estudiante else 'Nuevo estudiante' }}{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-3">{{ 'Editar estudiante' if estudiante else 'Nuevo estudiante' }}</h1>
+{{ m.resumen_errores(errores) }}
+
+<form class="tarjeta" method="post" data-un-envio novalidate>
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  {% include 'estudiantes/_campos.html' %}
+  <div class="d-flex flex-wrap gap-2">
+    <button type="submit" class="btn btn-primary" data-enviando="Guardando…">Guardar</button>
+    <a class="btn btn-outline-secondary"
+       href="{{ volver or (url_for('estudiantes.trayectoria', id=estudiante.id) if estudiante else url_for('estudiantes.lista')) }}">Cancelar</a>
+  </div>
+</form>
+
+{% if estudiante %}
+  <form class="tarjeta d-flex flex-wrap justify-content-between align-items-center gap-2" method="post"
+        action="{{ url_for('estudiantes.estado', id=estudiante.id) }}"
+        onsubmit="return confirm('¿Confirma el cambio de estado del estudiante?');">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <div>
+      <strong>Estado:</strong> {{ 'Activo' if estudiante.activo else 'Desactivado' }}
+      <div class="small text-muted">Los estudiantes no se borran: se desactivan y su historial se conserva.</div>
+    </div>
+    {% if estudiante.activo %}
+      <button class="btn btn-outline-danger" type="submit">Desactivar</button>
+    {% else %}
+      <button class="btn btn-outline-success" type="submit">Reactivar</button>
+    {% endif %}
+  </form>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as m %}
+{% block titulo %}Inicio{% endblock %}
+{% block contenido %}
+<h1 class="h3">Hola, {{ usuario.nombre }}</h1>
+<p class="text-muted">{{ ROLES[usuario.rol] }} · Año lectivo {{ ANIO_ACTUAL }}</p>
+
+{% if usuario.rol in ('admin', 'directivo') %}
+  <div class="row g-3 mb-3">
+    <div class="col-sm-4"><div class="tarjeta h-100 mb-0">
+      <div class="contador">{{ total_estudiantes }}</div><div class="text-muted">Estudiantes activos</div>
+    </div></div>
+    <div class="col-sm-4"><div class="tarjeta h-100 mb-0">
+      <div class="contador">{{ inscriptos }}</div><div class="text-muted">Inscriptos en {{ ANIO_ACTUAL }}</div>
+    </div></div>
+    <div class="col-sm-4"><div class="tarjeta h-100 mb-0">
+      <div class="contador">{{ alertas|length }}</div><div class="text-muted">Estudiantes con alerta</div>
+    </div></div>
+  </div>
+
+  <div class="tarjeta">
+    <h2 class="h5">Accesos rápidos</h2>
+    <div class="d-flex flex-wrap gap-2">
+      {% if usuario.rol == 'admin' %}
+        <a class="btn btn-primary" href="{{ url_for('inscripciones.nueva') }}">Nueva inscripción</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('estudiantes.lista') }}">Estudiantes</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('administracion.cursos_lista') }}">Cursos</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('administracion.usuarios_lista') }}">Usuarios</a>
+      {% else %}
+        <a class="btn btn-outline-primary" href="{{ url_for('estudiantes.lista') }}">Estudiantes</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('administracion.auditoria') }}">Auditoría</a>
+      {% endif %}
+      <a class="btn btn-outline-primary" href="{{ url_for('reportes.index') }}">Reportes</a>
+    </div>
+  </div>
+
+  {% if usuario.rol == 'admin' and sin_inscripcion %}
+    <div class="tarjeta">
+      <h2 class="h5">Estudiantes sin inscripción en {{ ANIO_ACTUAL }}</h2>
+      <ul class="list-unstyled mb-0">
+        {% for e in sin_inscripcion %}
+          <li class="py-1">{{ e.apellido }}, {{ e.nombre }} <span class="text-muted">· DNI {{ e.dni }}</span>
+            <a class="btn btn-sm btn-link" href="{{ url_for('inscripciones.nueva', dni=e.dni) }}">Inscribir</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+{% elif usuario.rol == 'preceptor' %}
+  <div class="tarjeta">
+    <h2 class="h5">Mis cursos</h2>
+    {% for c in cursos %}
+      <div class="d-flex flex-wrap align-items-center justify-content-between border-bottom py-2 gap-2">
+        <div>
+          <strong>{{ c.nombre }}</strong> <span class="text-muted">· {{ c.inscriptos }} estudiantes</span>
+          {% if c.tomada_hoy %}<span class="badge text-bg-success">Asistencia de hoy cargada</span>
+          {% else %}<span class="badge text-bg-secondary">Falta la asistencia de hoy</span>{% endif %}
+        </div>
+        <a class="btn btn-primary" href="{{ url_for('aula.asistencia_planilla', curso_id=c.id, fecha=hoy) }}">
+          {% if c.tomada_hoy %}Revisar asistencia de hoy{% else %}Tomar asistencia de hoy{% endif %}</a>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">No tiene cursos asignados en {{ ANIO_ACTUAL }}.</p>
+    {% endfor %}
+  </div>
+
+{% else %}
+  <div class="tarjeta">
+    <h2 class="h5">Mis materias</h2>
+    {% for mat in materias %}
+      <div class="d-flex flex-wrap align-items-center justify-content-between border-bottom py-2 gap-2">
+        <div><strong>{{ mat.nombre }}</strong> <span class="text-muted">· {{ mat.curso }}</span></div>
+        <a class="btn btn-primary" href="{{ url_for('aula.notas_seleccion', materia_id=mat.id) }}">Cargar notas</a>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">No tiene materias asignadas en {{ ANIO_ACTUAL }}.</p>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="tarjeta">
+  <h2 class="h5">Alertas</h2>
+  <p class="small text-muted">
+    Faltas por encima de {{ LIMITE_FALTAS }} o notas por debajo de {{ NOTA_APROBACION }}.
+    El sistema solo señala: las decisiones las toma el equipo escolar.
+  </p>
+  {% if alertas %}
+    <div class="table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead><tr><th>Estudiante</th><th>Curso</th><th>Faltas</th><th>Notas bajas</th><th>Alertas</th><th></th></tr></thead>
+        <tbody>
+          {% for a in alertas %}
+            <tr>
+              <td>{{ a.apellido }}, {{ a.nombre }}</td>
+              <td>{{ a.curso }}</td>
+              <td>{{ a.faltas }}</td>
+              <td>{{ a.notas_bajas }}</td>
+              <td>{{ m.alertas(a.alertas) }}</td>
+              <td class="text-end text-nowrap"><a class="btn btn-sm btn-outline-primary" href="{{ url_for('estudiantes.trayectoria', id=a.id) }}">Trayectoria</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted mb-0">No hay estudiantes con alertas.</p>
+  {% endif %}
+</div>
+{% endblock %}

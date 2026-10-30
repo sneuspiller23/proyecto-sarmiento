@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ 'Estudiantes' if usuario.rol in ('admin', 'directivo') else 'Mis estudiantes' }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h3 mb-0">{{ 'Estudiantes' if usuario.rol in ('admin', 'directivo') else 'Mis estudiantes' }}</h1>
+  {% if usuario.rol == 'admin' %}
+    <a class="btn btn-primary" href="{{ url_for('estudiantes.nuevo') }}">Nuevo estudiante</a>
+  {% endif %}
+</div>
+
+<form class="tarjeta row g-2 align-items-end" method="get">
+  <div class="col-sm-6 col-lg-5">
+    <label class="form-label" for="q">Buscar por DNI o apellido</label>
+    <input class="form-control" id="q" name="q" value="{{ busqueda }}" placeholder="Ej.: 53.123.456 o Pérez">
+  </div>
+  {% if usuario.rol == 'admin' %}
+    <div class="col-auto form-check ms-2 mb-2">
+      <input class="form-check-input" type="checkbox" id="inactivos" name="inactivos" value="1" {% if ver_inactivos %}checked{% endif %}>
+      <label class="form-check-label" for="inactivos">Incluir desactivados</label>
+    </div>
+  {% endif %}
+  <div class="col-auto">
+    <button class="btn btn-outline-primary" type="submit">Buscar</button>
+    {% if busqueda or ver_inactivos %}<a class="btn btn-link" href="{{ url_for('estudiantes.lista') }}">Limpiar</a>{% endif %}
+  </div>
+</form>
+
+<div class="tarjeta">
+  <p class="text-muted small">{{ estudiantes|length }} estudiante(s)</p>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr><th>Apellido y nombre</th><th>DNI</th><th>Nacimiento</th><th>Curso {{ ANIO_ACTUAL }}</th><th>Responsable</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for e in estudiantes %}
+          <tr class="{% if not e.activo %}text-muted{% endif %}">
+            <td>{{ e.apellido }}, {{ e.nombre }}
+              {% if not e.activo %}<span class="badge text-bg-secondary">Desactivado</span>{% endif %}</td>
+            <td>{{ e.dni }}</td>
+            <td>{{ e.fecha_nac|fecha }}</td>
+            <td>{{ e.curso or '—' }}</td>
+            <td>{{ e.responsable_nombre }}<br><span class="small text-muted">{{ e.responsable_telefono }}</span></td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-primary" href="{{ url_for('estudiantes.trayectoria', id=e.id) }}">Trayectoria</a>
+              {% if usuario.rol == 'admin' %}
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('estudiantes.editar', id=e.id) }}">Editar</a>
+                {% if e.activo and not e.curso %}
+                  <a class="btn btn-sm btn-outline-success" href="{{ url_for('inscripciones.nueva', dni=e.dni) }}">Inscribir</a>
+                {% endif %}
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6" class="text-muted">No se encontraron estudiantes.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

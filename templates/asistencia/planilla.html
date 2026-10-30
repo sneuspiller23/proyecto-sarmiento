@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block titulo %}Asistencia {{ curso.nombre }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-0">Asistencia de {{ curso.nombre }}</h1>
+    <div class="text-muted">{{ fecha|fecha }}
+      {% if edicion %}<span class="badge text-bg-info">Ya cargada: está corrigiendo</span>{% endif %}</div>
+  </div>
+  <a class="btn btn-outline-secondary" href="{{ url_for('aula.asistencia_seleccion') }}">Cambiar curso o fecha</a>
+</div>
+
+{% if estudiantes %}
+  <form method="post" data-un-envio>
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <input type="hidden" name="curso_id" value="{{ curso.id }}">
+    <input type="hidden" name="fecha" value="{{ fecha.isoformat() }}">
+    <div class="tarjeta planilla-asistencia">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="small text-muted">{{ estudiantes|length }} estudiantes · «Presente» viene marcado por defecto</span>
+        <button type="button" class="btn btn-sm btn-outline-success" id="todos-presentes">Todos presentes</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <tbody>
+            {% for e in estudiantes %}
+              {% set actual = e.estado or 'P' %}
+              <tr>
+                <td>{{ e.apellido }}, {{ e.nombre }}<br><span class="small text-muted">DNI {{ e.dni }}</span></td>
+                <td class="text-end">
+                  <div class="btn-group" role="group" aria-label="Asistencia de {{ e.apellido }}">
+                    {% for codigo, texto in ESTADOS_ASISTENCIA.items() %}
+                      {% set color = {'P': 'success', 'A': 'danger', 'T': 'warning'}[codigo] %}
+                      <input type="radio" class="btn-check" name="estado_{{ e.id }}" id="estado_{{ e.id }}_{{ codigo }}"
+                             value="{{ codigo }}" autocomplete="off" {% if actual == codigo %}checked{% endif %}>
+                      <label class="btn btn-outline-{{ color }}" for="estado_{{ e.id }}_{{ codigo }}">{{ texto }}</label>
+                    {% endfor %}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg mb-4" data-enviando="Guardando…">Guardar asistencia</button>
+  </form>
+{% else %}
+  <div class="tarjeta text-muted">El curso no tiene estudiantes inscriptos.</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  var botonTodos = document.getElementById('todos-presentes');
+  if (botonTodos) {
+    botonTodos.addEventListener('click', function () {
+      document.querySelectorAll('input.btn-check[value=P]').forEach(function (radio) { radio.checked = true; });
+    });
+  }
+</script>
+{% endblock %}

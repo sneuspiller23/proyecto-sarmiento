@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block contenido %}
+<div class="tarjeta text-center py-5">
+  <div class="contador text-muted">{{ codigo }}</div>
+  <h1 class="h4 mt-2">{{ titulo }}</h1>
+  <p class="text-muted mx-auto" style="max-width: 32rem">{{ mensaje }}</p>
+  <a class="btn btn-primary" href="{{ url_for('general.inicio') }}">Volver al inicio</a>
+</div>
+{% endblock %}

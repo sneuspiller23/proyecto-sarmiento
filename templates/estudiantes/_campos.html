@@ -1,0 +1,10 @@
+{# Campos del estudiante; los usan el alta, la edición y la inscripción #}
+{% import '_macros.html' as m %}
+<div class="row">
+  <div class="col-md-4">{{ m.campo('dni', 'DNI', datos, errores, ayuda='Con o sin puntos: se guarda solo con números.', extra='inputmode="numeric"') }}</div>
+  <div class="col-md-4">{{ m.campo('apellido', 'Apellido', datos, errores) }}</div>
+  <div class="col-md-4">{{ m.campo('nombre', 'Nombre', datos, errores) }}</div>
+  <div class="col-md-4">{{ m.campo('fecha_nac', 'Fecha de nacimiento', datos, errores, tipo='date') }}</div>
+  <div class="col-md-4">{{ m.campo('responsable_nombre', 'Responsable (nombre y apellido)', datos, errores) }}</div>
+  <div class="col-md-4">{{ m.campo('responsable_telefono', 'Teléfono del responsable', datos, errores, tipo='tel') }}</div>
+</div>

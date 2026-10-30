@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block titulo %}Cursos{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h3 mb-0">Cursos {{ anio }}</h1>
+  <a class="btn btn-primary" href="{{ url_for('administracion.cursos_nuevo') }}">Nuevo curso</a>
+</div>
+
+<form class="tarjeta row g-2 align-items-end" method="get">
+  <div class="col-auto">
+    <label class="form-label" for="anio">Año lectivo</label>
+    <select class="form-select" id="anio" name="anio" onchange="this.form.submit()">
+      {% for a in anios %}<option value="{{ a }}" {% if a == anio %}selected{% endif %}>{{ a }}</option>{% endfor %}
+    </select>
+  </div>
+</form>
+
+<div class="tarjeta">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Curso</th><th>Preceptor</th><th>Inscriptos / cupo</th><th>Materias</th><th></th></tr></thead>
+      <tbody>
+        {% for c in cursos %}
+          <tr>
+            <td><strong>{{ c.nombre }}</strong></td>
+            <td>{{ c.preceptor or '—' }}</td>
+            <td>{{ c.inscriptos }} / {{ c.cupo }}</td>
+            <td><a href="{{ url_for('administracion.materias_lista', curso_id=c.id) }}">{{ c.materias }} materia(s)</a></td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('administracion.cursos_editar', id=c.id) }}">Editar</a>
+              <form class="d-inline" method="post" action="{{ url_for('administracion.cursos_eliminar', id=c.id) }}"
+                    onsubmit="return confirm('¿Eliminar el curso {{ c.nombre }}? Solo es posible si no tiene inscripciones ni notas.');">
+                <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+                <button class="btn btn-sm btn-outline-danger" type="submit" {% if c.inscriptos %}disabled title="Tiene inscriptos"{% endif %}>Eliminar</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="text-muted">No hay cursos cargados para {{ anio }}.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

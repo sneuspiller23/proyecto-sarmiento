@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% import '_macros.html' as m %}
+{% block titulo %}Nueva inscripción{% endblock %}
+{% block contenido %}
+<h1 class="h3">Nueva inscripción {{ ANIO_ACTUAL }}</h1>
+{% with paso = 2 %}{% include 'inscripciones/_pasos.html' %}{% endwith %}
+{{ m.resumen_errores(errores, 'La inscripción todavía no se guardó.') }}
+
+<form method="post" action="{{ url_for('inscripciones.guardar') }}" data-un-envio novalidate>
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+
+  <div class="tarjeta">
+    {% if estudiante %}
+      <input type="hidden" name="estudiante_id" value="{{ estudiante.id }}">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+        <h2 class="h5">Estudiante encontrado: revise sus datos</h2>
+        <a class="btn btn-sm btn-outline-secondary"
+           href="{{ url_for('estudiantes.editar', id=estudiante.id, volver=url_for('inscripciones.nueva', dni=estudiante.dni)) }}">Corregir datos</a>
+      </div>
+      <dl class="row mb-0">
+        <dt class="col-sm-4">Apellido y nombre</dt><dd class="col-sm-8">{{ estudiante.apellido }}, {{ estudiante.nombre }}</dd>
+        <dt class="col-sm-4">DNI</dt><dd class="col-sm-8">{{ estudiante.dni }}</dd>
+        <dt class="col-sm-4">Fecha de nacimiento</dt><dd class="col-sm-8">{{ estudiante.fecha_nac|fecha }}</dd>
+        <dt class="col-sm-4">Responsable</dt><dd class="col-sm-8">{{ estudiante.responsable_nombre }} · {{ estudiante.responsable_telefono }}</dd>
+      </dl>
+    {% else %}
+      <h2 class="h5">Estudiante nuevo: complete el alta</h2>
+      <p class="small text-muted">No había ningún estudiante con ese DNI. Se registra junto con la inscripción.</p>
+      {% include 'estudiantes/_campos.html' %}
+    {% endif %}
+  </div>
+
+  <div class="tarjeta">
+    <h2 class="h5">Curso</h2>
+    <div class="row">
+      <div class="col-sm-4">
+        <label class="form-label" for="anio_lectivo">Año lectivo</label>
+        <input class="form-control" id="anio_lectivo" value="{{ ANIO_ACTUAL }}" readonly>
+      </div>
+      <div class="col-sm-8">
+        <label class="form-label" for="curso_id">Curso y división</label>
+        <select class="form-select{% if errores.get('curso_id') %} is-invalid{% endif %}" id="curso_id" name="curso_id">
+          <option value="">Elija un curso…</option>
+          {% for c in cursos %}
+            <option value="{{ c.id }}" {% if datos.get('curso_id')|string == c.id|string %}selected{% endif %}>
+              {{ c.nombre }} — {{ c.inscriptos }}/{{ c.cupo }} inscriptos{% if c.inscriptos >= c.cupo %} (sin cupo){% endif %}
+            </option>
+          {% endfor %}
+        </select>
+        {% if errores.get('curso_id') %}<div class="invalid-feedback">{{ errores.curso_id }}</div>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    <button type="submit" class="btn btn-primary btn-lg" data-enviando="Guardando…">Guardar inscripción</button>
+    <a class="btn btn-outline-secondary btn-lg" href="{{ url_for('inscripciones.nueva') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

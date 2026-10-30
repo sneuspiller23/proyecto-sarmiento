@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block titulo %}Asistencia{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-3">Tomar asistencia</h1>
+
+{% if cursos %}
+  <form class="tarjeta row g-3 align-items-end" method="get" action="{{ url_for('aula.asistencia_planilla') }}">
+    <div class="col-sm-5">
+      <label class="form-label" for="curso_id">Curso</label>
+      <select class="form-select form-select-lg" id="curso_id" name="curso_id" required>
+        {% for c in cursos %}<option value="{{ c.id }}">{{ c.nombre }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-sm-4">
+      <label class="form-label" for="fecha">Fecha</label>
+      <input class="form-control form-control-lg" type="date" id="fecha" name="fecha" value="{{ hoy }}" max="{{ hoy }}" required>
+    </div>
+    <div class="col-sm-3">
+      <button class="btn btn-primary btn-lg w-100" type="submit">Abrir planilla</button>
+    </div>
+    <p class="small text-muted mb-0">Si ese día ya tiene asistencia cargada, se abre para corregirla (no se duplica).</p>
+  </form>
+{% else %}
+  <div class="tarjeta text-muted">No tiene cursos asignados en {{ ANIO_ACTUAL }}. Consulte con Administración.</div>
+{% endif %}
+{% endblock %}
