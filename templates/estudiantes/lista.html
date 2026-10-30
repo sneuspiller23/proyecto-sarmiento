@@ -30,23 +30,23 @@
   <div class="table-responsive">
     <table class="table table-hover align-middle mb-0">
       <thead>
-        <tr><th>Apellido y nombre</th><th>DNI</th><th>Nacimiento</th><th>Curso {{ ANIO_ACTUAL }}</th><th>Responsable</th><th></th></tr>
+        <tr><th>Apellido y nombre</th><th>DNI</th><th class="d-none d-lg-table-cell">Nacimiento</th><th>Curso {{ ANIO_ACTUAL }}</th><th class="d-none d-xl-table-cell">Responsable</th><th></th></tr>
       </thead>
       <tbody>
         {% for e in estudiantes %}
           <tr class="{% if not e.activo %}text-muted{% endif %}">
-            <td>{{ e.apellido }}, {{ e.nombre }}
+            <td><strong>{{ e.apellido }}</strong>, {{ e.nombre }}
               {% if not e.activo %}<span class="badge text-bg-secondary">Desactivado</span>{% endif %}</td>
             <td>{{ e.dni }}</td>
-            <td>{{ e.fecha_nac|fecha }}</td>
-            <td>{{ e.curso or '—' }}</td>
-            <td>{{ e.responsable_nombre }}<br><span class="small text-muted">{{ e.responsable_telefono }}</span></td>
+            <td class="d-none d-lg-table-cell">{{ e.fecha_nac|fecha }}</td>
+            <td>{% if e.curso %}<span class="badge text-bg-light border">{{ e.curso }}</span>{% else %}—{% endif %}</td>
+            <td class="d-none d-xl-table-cell">{{ e.responsable_nombre }}<br><span class="small text-muted">{{ e.responsable_telefono }}</span></td>
             <td class="text-end text-nowrap">
-              <a class="btn btn-sm btn-outline-primary" href="{{ url_for('estudiantes.trayectoria', id=e.id) }}">Trayectoria</a>
+              <a class="btn btn-sm btn-outline-primary" href="{{ url_for('estudiantes.trayectoria', id=e.id) }}" title="Ver trayectoria"><i class="bi bi-person-lines-fill"></i><span class="d-none d-xxl-inline ms-1">Trayectoria</span></a>
               {% if usuario.rol == 'admin' %}
-                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('estudiantes.editar', id=e.id) }}">Editar</a>
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('estudiantes.editar', id=e.id) }}" title="Editar datos"><i class="bi bi-pencil"></i></a>
                 {% if e.activo and not e.curso %}
-                  <a class="btn btn-sm btn-outline-success" href="{{ url_for('inscripciones.nueva', dni=e.dni) }}">Inscribir</a>
+                  <a class="btn btn-sm btn-success" href="{{ url_for('inscripciones.nueva', dni=e.dni) }}" title="Inscribir en {{ ANIO_ACTUAL }}"><i class="bi bi-person-plus"></i></a>
                 {% endif %}
               {% endif %}
             </td>

@@ -1,1 +1,1 @@
-"""Módulos del SIGE: cada archivo es un Blueprint con un grupo de pantallas."""
+"""Módulos del Proyecto Sarmiento: cada archivo es un Blueprint con un grupo de pantallas."""

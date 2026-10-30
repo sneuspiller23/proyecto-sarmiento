@@ -1,4 +1,4 @@
-"""Conexión a SQLite, creación de tablas y datos de ejemplo del SIGE."""
+"""Conexión a SQLite, creación de tablas y datos de ejemplo del Proyecto Sarmiento."""
 import os
 import random
 import sqlite3

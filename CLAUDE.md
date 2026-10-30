@@ -1,4 +1,7 @@
-# Sistema Integral de Gestión Escolar (SIGE)
+# Proyecto Sarmiento · Sistema Integral de Gestión Escolar
+
+En la app: «Sarmiento» en el logo y las pestañas; «Proyecto Sarmiento» con el subtítulo
+«Sistema Integral de Gestión Escolar» en el ingreso, la constancia y la documentación.
 
 Aplicación web de demostración para un trabajo práctico de Sistemas de Información.
 Gestiona estudiantes, inscripciones, asistencia y notas de un colegio secundario,
@@ -142,7 +145,7 @@ Datos abundantes, porque la app es para mostrar el funcionamiento:
 
 ## 7. Estilo
 
-Sobrio y prolijo: barra superior con «Sistema Integral de Gestión Escolar», usuario y
+Sobrio y prolijo: barra superior con «Proyecto Sarmiento · Sistema Integral de Gestión Escolar», usuario y
 botón Salir; menú lateral; tablas de Bootstrap; mensajes con `flash()` (verde si salió
 bien, rojo si hubo error). Tiene que verse bien en una notebook y en una tableta.
 

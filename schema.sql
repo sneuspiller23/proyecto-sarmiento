@@ -1,4 +1,4 @@
--- Tablas del Sistema Integral de Gestión Escolar (SIGE)
+-- Tablas del Proyecto Sarmiento (Sistema Integral de Gestión Escolar)
 
 CREATE TABLE usuarios (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,

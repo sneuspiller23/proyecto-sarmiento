@@ -1,4 +1,4 @@
-"""Sistema Integral de Gestión Escolar (SIGE).
+"""Proyecto Sarmiento · Sistema Integral de Gestión Escolar.
 
 Registrar una vez, consultar según el rol y conservar el historial.
 Para ejecutar:  pip install -r requirements.txt  y luego  python app.py
@@ -16,26 +16,27 @@ from comun import (ANIO_ACTUAL, ESTADOS_ASISTENCIA, LIMITE_FALTAS, NOTA_APROBACI
                    formatear_fecha, formatear_nota, numero_inscripcion)
 from modulos import administracion, aula, estudiantes, general, inscripciones, reportes
 
-# Menú lateral: (texto, endpoint, roles que lo ven, otras pantallas que lo marcan como activo)
+# Menú lateral: (texto, ícono de Bootstrap Icons, endpoint, roles que lo ven,
+#                otras pantallas que lo marcan como activo)
 MENU = [
-    ('Inicio', 'general.inicio', None, ()),
-    ('Nueva inscripción', 'inscripciones.nueva', ('admin',), ('inscripciones.guardar',)),
-    ('Inscripciones', 'inscripciones.lista', ('admin', 'directivo'), ('inscripciones.ver',)),
-    ('Estudiantes', 'estudiantes.lista', ('admin', 'directivo'),
+    ('Inicio', 'house-door', 'general.inicio', None, ()),
+    ('Nueva inscripción', 'person-plus', 'inscripciones.nueva', ('admin',), ('inscripciones.guardar',)),
+    ('Inscripciones', 'card-checklist', 'inscripciones.lista', ('admin', 'directivo'), ('inscripciones.ver',)),
+    ('Estudiantes', 'people', 'estudiantes.lista', ('admin', 'directivo'),
      ('estudiantes.nuevo', 'estudiantes.editar', 'estudiantes.trayectoria')),
-    ('Asistencia', 'aula.asistencia_seleccion', ('preceptor',), ('aula.asistencia_planilla',)),
-    ('Notas', 'aula.notas_seleccion', ('docente',), ('aula.notas_planilla',)),
-    ('Mis estudiantes', 'estudiantes.lista', ('preceptor', 'docente'), ('estudiantes.trayectoria',)),
-    ('Reportes', 'reportes.index', ('admin', 'directivo'),
+    ('Asistencia', 'calendar-check', 'aula.asistencia_seleccion', ('preceptor',), ('aula.asistencia_planilla',)),
+    ('Notas', 'journal-text', 'aula.notas_seleccion', ('docente',), ('aula.notas_planilla',)),
+    ('Mis estudiantes', 'people', 'estudiantes.lista', ('preceptor', 'docente'), ('estudiantes.trayectoria',)),
+    ('Reportes', 'bar-chart-line', 'reportes.index', ('admin', 'directivo'),
      ('reportes.nomina', 'reportes.asistencia', 'reportes.alertas')),
-    ('Cursos', 'administracion.cursos_lista', ('admin',),
+    ('Cursos', 'grid-3x3-gap', 'administracion.cursos_lista', ('admin',),
      ('administracion.cursos_nuevo', 'administracion.cursos_editar')),
-    ('Materias', 'administracion.materias_lista', ('admin',),
+    ('Materias', 'book', 'administracion.materias_lista', ('admin',),
      ('administracion.materias_nueva', 'administracion.materias_editar')),
-    ('Usuarios', 'administracion.usuarios_lista', ('admin',),
+    ('Usuarios', 'person-gear', 'administracion.usuarios_lista', ('admin',),
      ('administracion.usuarios_nuevo', 'administracion.usuarios_editar')),
-    ('Auditoría', 'administracion.auditoria', ('directivo',), ()),
-    ('Documentación', 'general.documentacion', ('admin',), ()),
+    ('Auditoría', 'shield-check', 'administracion.auditoria', ('directivo',), ()),
+    ('Documentación', 'file-earmark-text', 'general.documentacion', ('admin',), ()),
 ]
 
 MENSAJES_ERROR = {
@@ -83,10 +84,10 @@ def datos_para_plantillas():
     usuario = g.get('usuario')
     menu = []
     if usuario:
-        for texto, endpoint, roles, relacionados in MENU:
+        for texto, icono, endpoint, roles, relacionados in MENU:
             if roles is None or usuario['rol'] in roles:
                 activo = request.endpoint == endpoint or request.endpoint in relacionados
-                menu.append({'texto': texto, 'url': url_for(endpoint), 'activo': activo})
+                menu.append({'texto': texto, 'icono': icono, 'url': url_for(endpoint), 'activo': activo})
     return {
         'usuario': usuario, 'menu': menu, 'csrf_token': token_csrf, 'ROLES': ROLES,
         'ANIO_ACTUAL': ANIO_ACTUAL, 'NOTA_MIN': NOTA_MIN, 'NOTA_MAX': NOTA_MAX,

@@ -3,46 +3,51 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block titulo %}Inicio{% endblock %} · SIGE</title>
+  <title>{% block titulo %}Inicio{% endblock %} · Sarmiento</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-  <header class="navbar navbar-dark barra-superior d-print-none">
-    <div class="container-fluid">
-      <a class="navbar-brand fw-semibold" href="{{ url_for('general.inicio') }}">
-        <span class="d-none d-sm-inline">Sistema Integral de Gestión Escolar</span>
-        <span class="d-sm-none">SIGE</span>
+<body class="{{ 'con-menu' if usuario else 'pantalla-ingreso' }}">
+{% if usuario %}
+  <div class="disposicion">
+    <aside class="menu-lateral d-print-none">
+      <a class="marca" href="{{ url_for('general.inicio') }}">
+        <span class="marca-logo"><i class="bi bi-mortarboard-fill"></i></span>
+        <span class="marca-texto">
+          <strong>Sarmiento</strong>
+          <small>Gestión Escolar</small>
+        </span>
       </a>
-      {% if usuario %}
-        <div class="d-flex align-items-center gap-2 text-white">
-          <span class="d-none d-md-inline">{{ usuario.nombre }}</span>
-          <span class="badge text-bg-light">{{ ROLES[usuario.rol] }}</span>
+      <nav class="menu">
+        {% for item in menu %}
+          <a class="menu-item{% if item.activo %} activo{% endif %}" href="{{ item.url }}">
+            <i class="bi bi-{{ item.icono }}"></i><span>{{ item.texto }}</span>
+          </a>
+        {% endfor %}
+      </nav>
+      <div class="menu-pie">Ciclo lectivo {{ ANIO_ACTUAL }}</div>
+    </aside>
+
+    <div class="principal">
+      <header class="barra-superior d-print-none">
+        <span class="barra-titulo">Proyecto Sarmiento · Sistema Integral de Gestión Escolar</span>
+        <div class="usuario-chip">
+          {% set partes = usuario.nombre.split() %}
+          <span class="avatar">{{ partes[0][0] }}{{ partes[-1][0] if partes|length > 1 }}</span>
+          <span class="usuario-datos">
+            <strong>{{ usuario.nombre }}</strong>
+            <small>{{ ROLES[usuario.rol] }}</small>
+          </span>
           <form method="post" action="{{ url_for('general.logout') }}" class="m-0">
             <input type="hidden" name="csrf" value="{{ csrf_token() }}">
-            <button type="submit" class="btn btn-sm btn-outline-light">Salir</button>
+            <button type="submit" class="btn btn-sm btn-salir" title="Salir"><i class="bi bi-box-arrow-right"></i><span>Salir</span></button>
           </form>
         </div>
-      {% endif %}
-    </div>
-  </header>
+      </header>
 
-  <div class="container-fluid">
-    <div class="row">
-      {% if usuario %}
-        <nav class="col-md-3 col-lg-2 menu-lateral d-print-none">
-          <ul class="nav nav-pills flex-md-column">
-            {% for item in menu %}
-              <li class="nav-item">
-                <a class="nav-link{% if item.activo %} active{% endif %}" href="{{ item.url }}">{{ item.texto }}</a>
-              </li>
-            {% endfor %}
-          </ul>
-        </nav>
-      {% endif %}
-
-      <main class="col contenido">
-        <div class="d-print-none">
+      <main class="contenido">
+        <div class="avisos d-print-none">
           {% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
             <div class="alert alert-{{ categoria }} alert-dismissible fade show" role="alert">
               {{ mensaje }}
@@ -54,6 +59,19 @@
       </main>
     </div>
   </div>
+{% else %}
+  <main class="ingreso">
+    <div class="avisos">
+      {% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
+        <div class="alert alert-{{ categoria }} alert-dismissible fade show" role="alert">
+          {{ mensaje }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+      {% endfor %}
+    </div>
+    {{ self.contenido() }}
+  </main>
+{% endif %}
 
   <script src="{{ url_for('static', filename='vendor/bootstrap.bundle.min.js') }}"></script>
   <script>

@@ -1,4 +1,4 @@
-"""Constantes y utilidades que comparten todos los módulos del SIGE."""
+"""Constantes y utilidades que comparten todos los módulos del Proyecto Sarmiento."""
 import re
 from datetime import date, datetime
 from functools import wraps

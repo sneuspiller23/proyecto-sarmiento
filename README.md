@@ -1,4 +1,6 @@
-# Sistema Integral de Gestión Escolar (SIGE)
+# Proyecto Sarmiento
+
+**Sistema Integral de Gestión Escolar.** El nombre es un homenaje a Domingo Faustino Sarmiento, impulsor de la educación pública argentina.
 
 Aplicación web de demostración para el trabajo práctico de Sistemas de Información.
 Gestiona estudiantes, inscripciones, asistencia y notas de un colegio secundario, con

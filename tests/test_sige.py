@@ -1,4 +1,4 @@
-"""Pruebas del SIGE.
+"""Pruebas del Proyecto Sarmiento.
 
 Ejecutar desde la carpeta del proyecto:  python -m unittest discover tests
 
